@@ -1,0 +1,44 @@
+url = 'https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/spacex_launch_geo.csv'
+response = requests.get(url)
+if response.status_code == 200:
+    spacex_df = pd.read_csv(StringIO(response.text))
+else:
+    print("Failed to download the file")
+map_center = [37.0902, -95.7129]
+spacex_map = folium.Map(location=map_center, zoom_start=5)
+launch_sites = {
+    "VAFB SLC-4E": [34.6329, -120.6108],
+    "FS LC-40": [28.3922, -80.6077],
+    "KSC LC-39A": [28.5721, -80.6480],
+    "CCAFS SLC-40": [28.563197, -80.576820],
+}
+closest_distances = {
+    "VAFB SLC-4E": {"city": 10, "railway": 15, "highway": 5},
+    "FS LC-40": {"city": 8, "railway": 12, "highway": 6},
+    "KSC LC-39A": {"city": 12, "railway": 9, "highway": 4},
+    "CCAFS SLC-40": {"city": 7, "railway": 10, "highway": 3},
+}
+for index, row in spacex_df.iterrows():
+    site = row['Launch Site']
+    outcome = row['Landing Outcome']
+    coords = launch_sites.get(site)
+    if coords:
+        folium.Marker(
+            location=coords,
+            popup=f"{site}: {outcome}",
+            icon=folium.Icon(color='darkgreen' if 'Success' in outcome else 'red')
+        ).add_to(spacex_map)
+for site_name, coords in launch_sites.items():
+    distances = closest_distances[site_name]
+    popup_text = (
+        f"{site_name}<br>"
+        f"Closest City: {distances['city']} km<br>"
+        f"Closest Railway: {distances['railway']} km<br>"
+        f"Closest Highway: {distances['highway']} km"
+    )
+    folium.Marker(
+        location=coords,
+        popup=popup_text,
+        icon=folium.Icon(color='blue')
+    ).add_to(spacex_map)
+spacex_map
