@@ -1,0 +1,819 @@
+import piplite
+await piplite.install(['numpy'])
+await piplite.install(['pandas'])
+await piplite.install(['seaborn'])
+# Pandas is a software library written for the Python programming language for data manipulation and analysis.
+import pandas as pd
+# NumPy is a library for the Python programming language, adding support for large, multi-dimensional arrays and matrices, along with a large collection of high-level mathematical functions to operate on these arrays
+import numpy as np
+# Matplotlib is a plotting library for python and pyplot gives us a MatLab like plotting framework. We will use this in our plotter function to plot data.
+import matplotlib.pyplot as plt
+#Seaborn is a Python data visualization library based on matplotlib. It provides a high-level interface for drawing attractive and informative statistical graphics
+import seaborn as sns
+# Preprocessing allows us to standarsize our data
+from sklearn import preprocessing
+# Allows us to split our data into training and testing data
+from sklearn.model_selection import train_test_split
+# Allows us to test parameters of classification algorithms and find the best one
+from sklearn.model_selection import GridSearchCV
+# Logistic Regression classification algorithm
+from sklearn.linear_model import LogisticRegression
+# Support Vector Machine classification algorithm
+from sklearn.svm import SVC
+# Decision Tree classification algorithm
+from sklearn.tree import DecisionTreeClassifier
+# K Nearest Neighbors classification algorithm
+from sklearn.neighbors import KNeighborsClassifier
+
+def plot_confusion_matrix(y,y_predict):
+    "this function plots the confusion matrix"
+    from sklearn.metrics import confusion_matrix
+
+    cm = confusion_matrix(y, y_predict)
+    ax= plt.subplot()
+    sns.heatmap(cm, annot=True, ax = ax); #annot=True to annotate cells
+    ax.set_xlabel('Predicted labels')
+    ax.set_ylabel('True labels')
+    ax.set_title('Confusion Matrix'); 
+    ax.xaxis.set_ticklabels(['did not land', 'land']); ax.yaxis.set_ticklabels(['did not land', 'landed']) 
+    plt.show() 
+
+# Load the dataframe
+from js import fetch
+import io
+
+URL1 = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_2.csv"
+resp1 = await fetch(URL1)
+text1 = io.BytesIO((await resp1.arrayBuffer()).to_py())
+data = pd.read_csv(text1)
+
+# TASK 1
+Create a NumPy array from the column Class in data, by applying the method to_numpy() then assign it to the variable Y,make sure the output is a Pandas series (only one bracket df['name of column']).
+# Define a set of bad outcomes that we consider as failures
+bad_outcome = {'Failure', 'Crash', 'Lost'}
+
+# Create a new list 'landing_class' by iterating over the 'Outcome' column in the DataFrame 'df'
+# Assign a value of 0 for bad outcomes and 1 for successful outcomes
+landing_class = [0 if outcome in bad_outcome else 1 for outcome in df['Outcome']]
+
+# Print the 'landing_class' list which contains the classification of each landing outcome
+print(landing_class)
+
+# TASK 2
+# Standardize the data in X then reassign it to the variable X using the transform provided below.
+
+# Import the StandardScaler from sklearn.preprocessing
+from sklearn.preprocessing import StandardScaler
+
+# Create an instance of StandardScaler
+scaler = StandardScaler()
+
+# Fit the scaler to the data in X and transform it, then reassign the transformed data to the variable X
+X = scaler.fit_transform(X)
+
+# Now the data in X is standardized
+
+"""
+TASK 3
+Use the function train_test_split to split the data X and Y into training and test data. Set the parameter test_size to 0.2 and random_state to 2. The training data and test data should be assigned to the following labels.
+
+X_train, X_test, Y_train, Y_test
+"""
+
+# Import the pandas library for data manipulation
+import pandas as pd
+
+# Import the requests library to handle HTTP requests
+import requests
+
+# Import StringIO from the io module to handle string data as file-like objects
+from io import StringIO
+
+# Import StandardScaler for data standardization
+from sklearn.preprocessing import StandardScaler
+
+# Import train_test_split for splitting the data into training and test sets
+from sklearn.model_selection import train_test_split
+
+# Define the URL of the dataset
+URL2 = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_2.csv"
+
+# Send a GET request to the URL and store the response
+response = requests.get(URL2)
+
+# Read the CSV data into a pandas DataFrame
+data = pd.read_csv(StringIO(response.text))
+
+# Convert the 'Class' column to a NumPy array and assign it to the variable Y
+Y = data['Class'].to_numpy()
+
+# Select numeric columns from the DataFrame for standardization
+numeric_columns = data.select_dtypes(include=['float64', 'int64']).columns
+
+# Assign the selected numeric columns to the variable X
+X = data[numeric_columns]
+
+# Create an instance of StandardScaler for data standardization
+scaler = StandardScaler()
+
+# Fit and transform the data in X using the scaler, reassigning the standardized data back to X
+X = scaler.fit_transform(X)
+
+# Split the data into training and test sets with a test size of 20% and a random state for reproducibility
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=2)
+
+# Print the shapes of the training and test sets to verify the split
+print("X_train shape:", X_train.shape)
+print("X_test shape:", X_test.shape)
+print("Y_train shape:", Y_train.shape)
+print("Y_test shape:", Y_test.shape)
+
+#Output
+"""
+X_train shape: (72, 8)
+X_test shape: (18, 8)
+Y_train shape: (72,)
+Y_test shape: (18,)
+"""
+#TASK 4
+# Create a logistic regression object, then a GridSearchCV object logreg_cv with cv = 10. Fit the object to find the best parameters from the dictionary parameters.
+
+# Convert the 'Class' column to a NumPy array and assign it to the variable Y
+Y = data['Class'].to_numpy()
+
+# Select numeric columns from the DataFrame for standardization
+numeric_columns = data.select_dtypes(include=['float64', 'int64']).columns
+
+# Assign the selected numeric columns to the variable X
+X = data[numeric_columns]
+
+# Create an instance of StandardScaler for data standardization
+scaler = StandardScaler()
+
+# Fit and transform the data in X using the scaler, reassigning the standardized data back to X
+X = scaler.fit_transform(X)
+
+# Split the data into training and test sets with a test size of 20% and a random state for reproducibility
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=2)
+
+# Define the hyperparameter grid for GridSearchCV
+parameters = {'C': [0.01, 0.1, 1],
+              'penalty': ['l2'],
+              'solver': ['lbfgs']}
+
+# Create a LogisticRegression object
+lr = LogisticRegression()
+
+# Create a GridSearchCV object with the logistic regression model and the parameter grid, using 10-fold cross-validation
+logreg_cv = GridSearchCV(lr, parameters, cv=10)
+
+# Fit the GridSearchCV object to the training data
+logreg_cv.fit(X_train, Y_train)
+
+# Print the best hyperparameters found by GridSearchCV
+print("Tuned hyperparameters: (best parameters) ", logreg_cv.best_params_)
+
+# Print the best accuracy score found by GridSearchCV
+print("Accuracy: ", logreg_cv.best_score_)
+
+
+#TASK 5
+#Calculate the accuracy on the test data using the method score
+
+# Import the pandas library for data manipulation
+#import pandas as pd
+
+# Import the requests library to handle HTTP requests
+#import requests
+
+# Import StringIO from the io module to handle string data as file-like objects
+#from io import StringIO
+
+# Import StandardScaler for data standardization
+from sklearn.preprocessing import StandardScaler
+
+# Import train_test_split for splitting the data into training and test sets
+from sklearn.model_selection import train_test_split
+
+# Import GridSearchCV for hyperparameter tuning
+from sklearn.model_selection import GridSearchCV
+
+# Import LogisticRegression for creating the logistic regression model
+from sklearn.linear_model import LogisticRegression
+
+# Import ConfusionMatrixDisplay and accuracy_score for model evaluation
+from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score
+
+# Import matplotlib for plotting
+import matplotlib.pyplot as plt
+
+# Define the URL of the dataset
+URL2 = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_2.csv"
+
+# Send a GET request to the URL and store the response
+response = requests.get(URL2)
+
+# Check if the response status code is 200 (OK)
+if response.status_code == 200:
+    # Read the CSV data from the response into a pandas DataFrame
+    data = pd.read_csv(StringIO(response.text))
+else:
+    # Print an error message if the file download failed
+    print("Failed to download the file")
+
+# Convert the 'Class' column to a NumPy array and assign it to the variable Y
+Y = data['Class'].to_numpy()
+
+# Select numeric columns from the DataFrame for standardization
+numeric_columns = data.select_dtypes(include=['float64', 'int64']).columns
+
+# Assign the selected numeric columns to the variable X
+X = data[numeric_columns]
+
+# Create an instance of StandardScaler for data standardization
+scaler = StandardScaler()
+
+# Fit and transform the data in X using the scaler, reassigning the standardized data back to X
+X = scaler.fit_transform(X)
+
+# Split the data into training and test sets with a test size of 20% and a random state for reproducibility
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=2)
+
+# Define the hyperparameter grid for GridSearchCV
+parameters = {'C': [0.01, 0.1, 1], 'penalty': ['l2'], 'solver': ['lbfgs']}
+
+# Create a LogisticRegression object
+lr = LogisticRegression()
+
+# Create a GridSearchCV object with the logistic regression model and the parameter grid, using 10-fold cross-validation
+logreg_cv = GridSearchCV(lr, parameters, cv=10)
+
+# Fit the GridSearchCV object to the training data
+logreg_cv.fit(X_train, Y_train)
+
+# Print the best hyperparameters found by GridSearchCV
+print("Tuned hyperparameters: (best parameters) ", logreg_cv.best_params_)
+
+# Print the best accuracy score found by GridSearchCV
+print("Accuracy: ", logreg_cv.best_score_)
+
+# Calculate the accuracy of the model on the test data
+test_accuracy = logreg_cv.score(X_test, Y_test)
+print("Test data accuracy: ", test_accuracy)
+
+# Predict the class labels for the test data
+yhat = logreg_cv.predict(X_test)
+
+# Plot and display the confusion matrix
+ConfusionMatrixDisplay.from_estimator(logreg_cv, X_test, Y_test)
+plt.show()
+
+# Print explanations for the confusion matrix values
+print("True Positive - 12 (True label is landed, Predicted label is also landed)")
+print("False Positive - 3 (True label is not landed, Predicted label is landed)")
+
+# TASK 6
+#Create a support vector machine object then create a GridSearchCV object svm_cv with cv = 10. Fit the object to find the best parameters from the dictionary parameters
+
+# Import the pandas library for data manipulation
+import pandas as pd
+
+# Import the requests library to handle HTTP requests
+import requests
+
+# Import StringIO from the io module to handle string data as file-like objects
+from io import StringIO
+
+# Import StandardScaler for data standardization
+from sklearn.preprocessing import StandardScaler
+
+# Import train_test_split for splitting the data into training and test sets
+from sklearn.model_selection import train_test_split
+
+# Import GridSearchCV for hyperparameter tuning
+from sklearn.model_selection import GridSearchCV
+
+# Import SVC for creating the Support Vector Classifier model
+from sklearn.svm import SVC
+
+# Import numpy for numerical operations
+import numpy as np
+
+# Define the URL of the dataset
+URL2 = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_2.csv"
+
+# Convert the 'Class' column to a NumPy array and assign it to the variable Y
+Y = data['Class'].to_numpy()
+
+# Select numeric columns from the DataFrame for standardization
+numeric_columns = data.select_dtypes(include=['float64', 'int64']).columns
+
+# Assign the selected numeric columns to the variable X
+X = data[numeric_columns]
+
+# Create an instance of StandardScaler for data standardization
+scaler = StandardScaler()
+
+# Fit and transform the data in X using the scaler, reassigning the standardized data back to X
+X = scaler.fit_transform(X)
+
+# Split the data into training and test sets with a test size of 20% and a random state for reproducibility
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=2)
+
+# Define the hyperparameter grid for GridSearchCV
+parameters = {'kernel': ('linear', 'rbf', 'poly', 'sigmoid'),
+              'C': np.logspace(-3, 3, 5),
+              'gamma': np.logspace(-3, 3, 5)}
+
+# Create a Support Vector Classifier (SVC) object
+svm = SVC()
+
+# Create a GridSearchCV object with the SVC model and the parameter grid, using 10-fold cross-validation
+svm_cv = GridSearchCV(svm, parameters, cv=10)
+
+# Fit the GridSearchCV object to the training data
+svm_cv.fit(X_train, Y_train)
+
+# Print the best hyperparameters found by GridSearchCV
+print("Tuned hyperparameters: (best parameters) ", svm_cv.best_params_)
+
+# Print the best accuracy score found by GridSearchCV
+print("Accuracy: ", svm_cv.best_score_)
+
+# TASK 7 Calculate the accuracy on the test data using the method score
+# Import the pandas library for data manipulation
+import pandas as pd
+
+# Import the requests library to handle HTTP requests
+import requests
+
+# Import StringIO from the io module to handle string data as file-like objects
+from io import StringIO
+
+# Import StandardScaler for data standardization
+from sklearn.preprocessing import StandardScaler
+
+# Import train_test_split for splitting the data into training and test sets
+from sklearn.model_selection import train_test_split
+
+# Import GridSearchCV for hyperparameter tuning
+from sklearn.model_selection import GridSearchCV
+
+# Import SVC for creating the Support Vector Classifier model
+from sklearn.svm import SVC
+
+# Import ConfusionMatrixDisplay and accuracy_score for model evaluation
+from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score
+
+# Import numpy for numerical operations
+import numpy as np
+
+# Import matplotlib for plotting
+import matplotlib.pyplot as plt
+
+# Define the URL of the dataset
+URL2 = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_2.csv"
+
+# Send a GET request to the URL and store the response
+response = requests.get(URL2)
+
+# Check if the response status code is 200 (OK)
+if response.status_code == 200:
+    # Read the CSV data from the response into a pandas DataFrame
+    data = pd.read_csv(StringIO(response.text))
+else:
+    # Print an error message if the file download failed
+    print("Failed to download the file")
+
+# Convert the 'Class' column to a NumPy array and assign it to the variable Y
+Y = data['Class'].to_numpy()
+
+# Select numeric columns from the DataFrame for standardization
+numeric_columns = data.select_dtypes(include=['float64', 'int64']).columns
+
+# Assign the selected numeric columns to the variable X
+X = data[numeric_columns]
+
+# Create an instance of StandardScaler for data standardization
+scaler = StandardScaler()
+
+# Fit and transform the data in X using the scaler, reassigning the standardized data back to X
+X = scaler.fit_transform(X)
+
+# Split the data into training and test sets with a test size of 20% and a random state for reproducibility
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=2)
+
+# Define the hyperparameter grid for GridSearchCV
+parameters = {'kernel': ('linear', 'rbf', 'poly', 'sigmoid'),
+              'C': np.logspace(-3, 3, 5),
+              'gamma': np.logspace(-3, 3, 5)}
+
+# Create a Support Vector Classifier (SVC) object
+svm = SVC()
+
+# Create a GridSearchCV object with the SVC model and the parameter grid, using 10-fold cross-validation
+svm_cv = GridSearchCV(svm, parameters, cv=10)
+
+# Fit the GridSearchCV object to the training data
+svm_cv.fit(X_train, Y_train)
+
+# Print the best hyperparameters found by GridSearchCV
+print("Tuned hyperparameters: (best parameters) ", svm_cv.best_params_)
+
+# Print the best accuracy score found by GridSearchCV
+print("Accuracy: ", svm_cv.best_score_)
+
+# Calculate the accuracy of the model on the test data
+test_accuracy = svm_cv.score(X_test, Y_test)
+print("Test data accuracy: ", test_accuracy)
+
+# Predict the class labels for the test data
+yhat = svm_cv.predict(X_test)
+
+# Plot and display the confusion matrix
+ConfusionMatrixDisplay.from_estimator(svm_cv, X_test, Y_test)
+plt.show()
+
+# TASK 8 Create a decision tree classifier object then create a GridSearchCV object tree_cv with cv = 10. Fit the object to find the best parameters from the dictionary parameters.
+# Import the pandas library for data manipulation
+import pandas as pd
+
+# Import the requests library to handle HTTP requests
+import requests
+
+# Import StringIO from the io module to handle string data as file-like objects
+from io import StringIO
+
+# Import StandardScaler for data standardization
+from sklearn.preprocessing import StandardScaler
+
+# Import train_test_split for splitting the data into training and test sets
+from sklearn.model_selection import train_test_split
+
+# Import GridSearchCV for hyperparameter tuning
+from sklearn.model_selection import GridSearchCV
+
+# Import DecisionTreeClassifier for creating the decision tree model
+from sklearn.tree import DecisionTreeClassifier
+
+# Define the URL of the dataset
+URL2 = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_2.csv"
+
+# Convert the 'Class' column to a NumPy array and assign it to the variable Y
+Y = data['Class'].to_numpy()
+
+# Select numeric columns from the DataFrame for standardization
+numeric_columns = data.select_dtypes(include=['float64', 'int64']).columns
+
+# Assign the selected numeric columns to the variable X
+X = data[numeric_columns]
+
+# Create an instance of StandardScaler for data standardization
+scaler = StandardScaler()
+
+# Fit and transform the data in X using the scaler, reassigning the standardized data back to X
+X = scaler.fit_transform(X)
+
+# Split the data into training and test sets with a test size of 20% and a random state for reproducibility
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=2)
+
+# Define the hyperparameter grid for GridSearchCV
+parameters = {'criterion': ['gini', 'entropy'],
+              'splitter': ['best', 'random'],
+              'max_depth': [2*n for n in range(1,10)],
+              'max_features': [None, 'sqrt', 'log2'],
+              'min_samples_leaf': [1, 2, 4],
+              'min_samples_split': [2, 5, 10]}
+
+# Create a DecisionTreeClassifier object
+tree = DecisionTreeClassifier()
+
+# Create a GridSearchCV object with the decision tree model and the parameter grid, using 10-fold cross-validation
+tree_cv = GridSearchCV(tree, parameters, cv=10)
+
+# Fit the GridSearchCV object to the training data
+tree_cv.fit(X_train, Y_train)
+
+# Print the best hyperparameters found by GridSearchCV
+print("Tuned hyperparameters: (best parameters) ", tree_cv.best_params_)
+
+# Print the best accuracy score found by GridSearchCV
+print("Accuracy: ", tree_cv.best_score_)
+
+# TASK 9 Calculate the accuracy of tree_cv on the test data using the method score
+# Import the pandas library for data manipulation
+import pandas as pd
+
+# Import the requests library to handle HTTP requests
+import requests
+
+# Import StringIO from the io module to handle string data as file-like objects
+from io import StringIO
+
+# Import StandardScaler for data standardization
+from sklearn.preprocessing import StandardScaler
+
+# Import train_test_split for splitting the data into training and test sets
+from sklearn.model_selection import train_test_split
+
+# Import GridSearchCV for hyperparameter tuning
+from sklearn.model_selection import GridSearchCV
+
+# Import DecisionTreeClassifier for creating the decision tree model
+from sklearn.tree import DecisionTreeClassifier
+
+# Import ConfusionMatrixDisplay and accuracy_score for model evaluation
+from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score
+
+# Import matplotlib for plotting
+import matplotlib.pyplot as plt
+
+# Define the URL of the dataset
+URL2 = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_2.csv"
+
+# Send a GET request to the URL and store the response
+response = requests.get(URL2)
+
+# Check if the response status code is 200 (OK)
+if response.status_code == 200:
+    # Read the CSV data from the response into a pandas DataFrame
+    data = pd.read_csv(StringIO(response.text))
+else:
+    # Print an error message if the file download failed
+    print("Failed to download the file")
+
+# Convert the 'Class' column to a NumPy array and assign it to the variable Y
+Y = data['Class'].to_numpy()
+
+# Select numeric columns from the DataFrame for standardization
+numeric_columns = data.select_dtypes(include=['float64', 'int64']).columns
+
+# Assign the selected numeric columns to the variable X
+X = data[numeric_columns]
+
+# Create an instance of StandardScaler for data standardization
+scaler = StandardScaler()
+
+# Fit and transform the data in X using the scaler, reassigning the standardized data back to X
+X = scaler.fit_transform(X)
+
+# Split the data into training and test sets with a test size of 20% and a random state for reproducibility
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=2)
+
+# Define the hyperparameter grid for GridSearchCV
+parameters = {'criterion': ['gini', 'entropy'],
+              'splitter': ['best', 'random'],
+              'max_depth': [2*n for n in range(1,10)],
+              'max_features': [None, 'sqrt', 'log2'],
+              'min_samples_leaf': [1, 2, 4],
+              'min_samples_split': [2, 5, 10]}
+
+# Create a DecisionTreeClassifier object
+tree = DecisionTreeClassifier()
+
+# Create a GridSearchCV object with the decision tree model and the parameter grid, using 10-fold cross-validation
+tree_cv = GridSearchCV(tree, parameters, cv=10)
+
+# Fit the GridSearchCV object to the training data
+tree_cv.fit(X_train, Y_train)
+
+# Print the best hyperparameters found by GridSearchCV
+print("Tuned hyperparameters: (best parameters) ", tree_cv.best_params_)
+
+# Print the best accuracy score found by GridSearchCV
+print("Accuracy: ", tree_cv.best_score_)
+
+# Calculate the accuracy of the model on the test data
+test_accuracy = tree_cv.score(X_test, Y_test)
+print("Test data accuracy: ", test_accuracy)
+
+# Predict the class labels for the test data
+yhat = tree_cv.predict(X_test)
+
+# Plot and display the confusion matrix
+ConfusionMatrixDisplay.from_predictions(Y_test, yhat)
+plt.show()
+
+# TASK 10 Create a k nearest neighbors object then create a GridSearchCV object knn_cv with cv = 10. Fit the object to find the best parameters from the dictionary parameters.
+
+# Import the pandas library for data manipulation
+import pandas as pd
+
+# Import the requests library to handle HTTP requests
+import requests
+
+# Import StringIO from the io module to handle string data as file-like objects
+from io import StringIO
+
+# Import StandardScaler for data standardization
+from sklearn.preprocessing import StandardScaler
+
+# Import train_test_split for splitting the data into training and test sets
+from sklearn.model_selection import train_test_split
+
+# Import GridSearchCV for hyperparameter tuning
+from sklearn.model_selection import GridSearchCV
+
+# Import KNeighborsClassifier for creating the K-Nearest Neighbors model
+from sklearn.neighbors import KNeighborsClassifier
+
+# Define the URL of the dataset
+URL2 = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_2.csv"
+
+# Send a GET request to the URL and store the response
+response = requests.get(URL2)
+
+# Check if the response status code is 200 (OK)
+if response.status_code == 200:
+    # Read the CSV data from the response into a pandas DataFrame
+    data = pd.read_csv(StringIO(response.text))
+else:
+    # Print an error message if the file download failed
+    print("Failed to download the file")
+
+# Convert the 'Class' column to a NumPy array and assign it to the variable Y
+Y = data['Class'].to_numpy()
+
+# Select numeric columns from the DataFrame for standardization
+numeric_columns = data.select_dtypes(include=['float64', 'int64']).columns
+
+# Assign the selected numeric columns to the variable X
+X = data[numeric_columns]
+
+# Create an instance of StandardScaler for data standardization
+scaler = StandardScaler()
+
+# Fit and transform the data in X using the scaler, reassigning the standardized data back to X
+X = scaler.fit_transform(X)
+
+# Split the data into training and test sets with a test size of 20% and a random state for reproducibility
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=2)
+
+# Define the hyperparameter grid for GridSearchCV
+parameters = {'n_neighbors': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+              'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute'],
+              'p': [1, 2]}
+
+# Create a KNeighborsClassifier object
+KNN = KNeighborsClassifier()
+
+# Create a GridSearchCV object with the KNN model and the parameter grid, using 10-fold cross-validation
+knn_cv = GridSearchCV(KNN, parameters, cv=10)
+
+# Fit the GridSearchCV object to the training data
+knn_cv.fit(X_train, Y_train)
+
+# Print the best hyperparameters found by GridSearchCV
+print("Tuned hyperparameters: (best parameters) ", knn_cv.best_params_)
+
+# Print the best accuracy score found by GridSearchCV
+print("Accuracy: ", knn_cv.best_score_)
+
+
+# TASK 11 Calculate the accuracy of knn_cv on the test data using the method score
+
+# Import the pandas library for data manipulation
+import pandas as pd
+
+# Import the requests library to handle HTTP requests
+import requests
+
+# Import StringIO from the io module to handle string data as file-like objects
+from io import StringIO
+
+# Convert the 'Class' column to a NumPy array and assign it to the variable Y
+Y = data['Class'].to_numpy()
+
+# Select numeric columns from the DataFrame for standardization
+numeric_columns = data.select_dtypes(include=['float64', 'int64']).columns
+
+# Assign the selected numeric columns to the variable X
+X = data[numeric_columns]
+
+# Create an instance of StandardScaler for data standardization
+scaler = StandardScaler()
+
+# Fit and transform the data in X using the scaler, reassigning the standardized data back to X
+X = scaler.fit_transform(X)
+
+# Split the data into training and test sets with a test size of 20% and a random state for reproducibility
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=2)
+
+# Define the hyperparameter grid for GridSearchCV
+parameters = {'n_neighbors': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+              'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute'],
+              'p': [1, 2]}
+
+# Create a KNeighborsClassifier object
+KNN = KNeighborsClassifier()
+
+# Create a GridSearchCV object with the KNN model and the parameter grid, using 10-fold cross-validation
+knn_cv = GridSearchCV(KNN, parameters, cv=10)
+
+# Fit the GridSearchCV object to the training data
+knn_cv.fit(X_train, Y_train)
+
+# Print the best hyperparameters found by GridSearchCV
+print("Tuned hyperparameters: (best parameters) ", knn_cv.best_params_)
+
+# Print the best accuracy score found by GridSearchCV
+print("Accuracy: ", knn_cv.best_score_)
+
+# Calculate the model's accuracy on the test data
+test_accuracy = knn_cv.score(X_test, Y_test)
+print("Test data accuracy: ", test_accuracy)
+
+# Predict the class labels for the test data
+yhat = knn_cv.predict(X_test)
+
+# Plot and display the confusion matrix
+ConfusionMatrixDisplay.from_predictions(Y_test, yhat)
+plt.show()
+
+
+# Define the URL of the dataset
+URL2 = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_2.csv"
+
+# Send a GET request to the URL and store the response
+response = requests.get(URL2)
+
+# Check if the response status code is 200 (OK)
+if response.status_code == 200:
+    # Read the CSV data from the response into a pandas DataFrame
+    data = pd.read_csv(StringIO(response.text))
+else:
+    # Print an error message if the file download failed
+    print("Failed to download the file")
+
+# Convert the 'Class' column to a NumPy array and assign it to the variable Y
+Y = data['Class'].to_numpy()
+
+# Select numeric columns from the DataFrame for standardization
+numeric_columns = data.select_dtypes(include=['float64', 'int64']).columns
+
+# Assign the selected numeric columns to the variable X
+X = data[numeric_columns]
+
+# Create an instance of StandardScaler for data standardization
+scaler = StandardScaler()
+
+# Fit and transform the data in X using the scaler, reassigning the standardized data back to X
+X = scaler.fit_transform(X)
+
+# Split the data into training and test sets with a test size of 20% and a random state for reproducibility
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=2)
+
+# Define the hyperparameter grids for GridSearchCV for different models
+logreg_params = {'C': [0.01, 0.1, 1], 'penalty': ['l2'], 'solver': ['lbfgs']}
+svm_params = {'kernel': ('linear', 'rbf', 'poly', 'sigmoid'), 'C': np.logspace(-3, 3, 5), 'gamma': np.logspace(-3, 3, 5)}
+tree_params = {'criterion': ['gini', 'entropy'], 'splitter': ['best', 'random'], 'max_depth': [2*n for n in range(1, 10)], 'max_features': [None, 'sqrt', 'log2'], 'min_samples_leaf': [1, 2, 4], 'min_samples_split': [2, 5, 10]}
+knn_params = {'n_neighbors': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute'], 'p': [1, 2]}
+
+# Create instances of each model
+logreg = LogisticRegression()
+svm = SVC()
+tree = DecisionTreeClassifier()
+knn = KNeighborsClassifier()
+
+# Create GridSearchCV objects for each model with their respective parameter grids
+logreg_cv = GridSearchCV(logreg, logreg_params, cv=10)
+svm_cv = GridSearchCV(svm, svm_params, cv=10)
+tree_cv = GridSearchCV(tree, tree_params, cv=10)
+knn_cv = GridSearchCV(knn, knn_params, cv=10)
+
+# Fit the GridSearchCV objects to the training data
+logreg_cv.fit(X_train, Y_train)
+svm_cv.fit(X_train, Y_train)
+tree_cv.fit(X_train, Y_train)
+knn_cv.fit(X_train, Y_train)
+
+# Calculate and print the accuracy of each model on the test data
+logreg_accuracy = logreg_cv.score(X_test, Y_test)
+svm_accuracy = svm_cv.score(X_test, Y_test)
+tree_accuracy = tree_cv.score(X_test, Y_test)
+knn_accuracy = knn_cv.score(X_test, Y_test)
+print(f"Logistic Regression test data accuracy: {logreg_accuracy}")
+print(f"SVM test data accuracy: {svm_accuracy}")
+print(f"Decision Tree test data accuracy: {tree_accuracy}")
+print(f"KNN test data accuracy: {knn_accuracy}")
+
+# Predict the class labels for the test data using each model
+logreg_yhat = logreg_cv.predict(X_test)
+svm_yhat = svm_cv.predict(X_test)
+tree_yhat = tree_cv.predict(X_test)
+knn_yhat = knn_cv.predict(X_test)
+
+# Create a subplot to display the confusion matrices for each model
+fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+ConfusionMatrixDisplay.from_predictions(Y_test, logreg_yhat, ax=axes[0, 0])
+axes[0, 0].title.set_text('Logistic Regression')
+ConfusionMatrixDisplay.from_predictions(Y_test, svm_yhat, ax=axes[0, 1])
+axes[0, 1].title.set_text('SVM')
+ConfusionMatrixDisplay.from_predictions(Y_test, tree_yhat, ax=axes[1, 0])
+axes[1, 0].title.set_text('Decision Tree')
+ConfusionMatrixDisplay.from_predictions(Y_test, knn_yhat, ax=axes[1, 1])
+axes[1, 1].title.set_text('KNN')
+
+# Display the confusion matrix plots
+plt.show()
+
