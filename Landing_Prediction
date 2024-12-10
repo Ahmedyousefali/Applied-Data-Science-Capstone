@@ -1,0 +1,113 @@
+!pip install pandas
+!pip install numpy
+# Pandas is a software library written for the Python programming language for data manipulation and analysis.
+import pandas as pd
+#NumPy is a library for the Python programming language, adding support for large, multi-dimensional arrays and matrices, along with a large collection of high-level mathematical functions to operate on these arrays
+import numpy as np
+
+# Load Space X dataset
+df=pd.read_csv("https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_1.csv")
+df.head(10)
+#Identify and calculate the percentage of the missing values in each attribute
+
+#Identify which columns are numerical and categorical:
+
+# TASK 1: Calculate the number of launches on each site
+# Import the pandas library
+
+# Read the CSV file from the provided URL and create a DataFrame named 'df'
+
+# Count the occurrences of each unique value in the 'LaunchSite' column and store the results in 'launch_counts'
+launch_counts = df['LaunchSite'].value_counts()
+
+# Print the resulting counts of each LaunchSite
+print(launch_counts)
+
+""" This will give the outcome
+LaunchSite
+CCAFS SLC 40    55
+KSC LC 39A      22
+VAFB SLC 4E     13
+Name: count, dtype: int64
+"""
+
+"""
+LEO: Low Earth orbit (LEO)is an Earth-centred orbit with an altitude of 2,000 km (1,200 mi) or less (approximately one-third of the radius of Earth),[1] or with at least 11.25 periods per day (an orbital period of 128 minutes or less) and an eccentricity less than 0.25.[2] Most of the manmade objects in outer space are in LEO [1].
+
+VLEO: Very Low Earth Orbits (VLEO) can be defined as the orbits with a mean altitude below 450 km. Operating in these orbits can provide a number of benefits to Earth observation spacecraft as the spacecraft operates closer to the observation[2].
+
+GTO A geosynchronous orbit is a high Earth orbit that allows satellites to match Earth's rotation. Located at 22,236 miles (35,786 kilometers) above Earth's equator, this position is a valuable spot for monitoring weather, communications and surveillance. Because the satellite orbits at the same speed that the Earth is turning, the satellite seems to stay in place over a single longitude, though it may drift north to south,” NASA wrote on its Earth Observatory website [3] .
+
+SSO (or SO): It is a Sun-synchronous orbit also called a heliosynchronous orbit is a nearly polar orbit around a planet, in which the satellite passes over any given point of the planet's surface at the same local mean solar time [4] .
+
+ES-L1 :At the Lagrange points the gravitational forces of the two large bodies cancel out in such a way that a small object placed in orbit there is in equilibrium relative to the center of mass of the large bodies. L1 is one such point between the sun and the earth [5] .
+
+HEO A highly elliptical orbit, is an elliptic orbit with high eccentricity, usually referring to one around Earth [6].
+
+ISS A modular space station (habitable artificial satellite) in low Earth orbit. It is a multinational collaborative project between five participating space agencies: NASA (United States), Roscosmos (Russia), JAXA (Japan), ESA (Europe), and CSA (Canada) [7]
+
+MEO Geocentric orbits ranging in altitude from 2,000 km (1,200 mi) to just below geosynchronous orbit at 35,786 kilometers (22,236 mi). Also known as an intermediate circular orbit. These are "most commonly at 20,200 kilometers (12,600 mi), or 20,650 kilometers (12,830 mi), with an orbital period of 12 hours [8]
+
+HEO Geocentric orbits above the altitude of geosynchronous orbit (35,786 km or 22,236 mi) [9]
+
+GEO It is a circular geosynchronous orbit 35,786 kilometres (22,236 miles) above Earth's equator and following the direction of Earth's rotation [10]
+
+PO It is one type of satellites in which a satellite passes above or nearly above both poles of the body being orbited (usually a planet such as the Earth [11]
+"""
+
+# TASK 2: Calculate the number and occurrence of each orbit
+# The DataFrame 'df' is already created by reading a CSV file from the specified URL (this line is commented out)
+# df = pd.read_csv("https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_1.csv")
+
+# Count the occurrences of each unique value in the 'Orbit' column and store the results in 'orbit_counts'
+orbit_counts = df['Orbit'].value_counts()
+
+# Print the resulting counts of each Orbit
+print(orbit_counts)
+
+# We got
+"""
+Orbit
+GTO      27
+ISS      21
+VLEO     14
+PO        9
+LEO       7
+SSO       5
+MEO       3
+HEO       1
+ES-L1     1
+SO        1
+GEO       1
+Name: count, dtype: int64
+"""
+
+# TASK 3: Calculate the number and occurence of mission outcome of the orbits
+landing_outcomes = df['Outcome'].value_counts()
+print(landing_outcomes)
+
+"""
+Outcome
+True ASDS      41
+None None      19
+True RTLS      14
+False ASDS      6
+True Ocean      5
+False Ocean     2
+None ASDS       2
+False RTLS      1
+Name: count, dtype: int64
+"""
+
+# TASK 4: Create a landing outcome label from Outcome column
+# Define a set of bad outcomes that we consider as failures
+bad_outcome = {'Failure', 'Crash', 'Lost'}
+
+# Create a new list 'landing_class' by iterating over the 'Outcome' column in the DataFrame 'df'
+# Assign a value of 0 for bad outcomes and 1 for successful outcomes
+landing_class = [0 if outcome in bad_outcome else 1 for outcome in df['Outcome']]
+
+# Print the 'landing_class' list which contains the classification of each landing outcome
+print(landing_class)
+
+
