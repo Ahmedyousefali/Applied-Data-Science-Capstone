@@ -1,0 +1,158 @@
+!pip3 install beautifulsoup4
+!pip3 install requests
+import sys
+
+import requests
+from bs4 import BeautifulSoup
+import re
+import unicodedata
+import pandas as pd
+def date_time(table_cells):
+    """
+    This function returns the data and time from the HTML  table cell
+    Input: the  element of a table data cell extracts extra row
+    """
+    return [data_time.strip() for data_time in list(table_cells.strings)][0:2]
+
+def booster_version(table_cells):
+    """
+    This function returns the booster version from the HTML  table cell 
+    Input: the  element of a table data cell extracts extra row
+    """
+    out=''.join([booster_version for i,booster_version in enumerate( table_cells.strings) if i%2==0][0:-1])
+    return out
+
+def landing_status(table_cells):
+    """
+    This function returns the landing status from the HTML table cell 
+    Input: the  element of a table data cell extracts extra row
+    """
+    out=[i for i in table_cells.strings][0]
+    return out
+
+
+def get_mass(table_cells):
+    mass=unicodedata.normalize("NFKD", table_cells.text).strip()
+    if mass:
+        mass.find("kg")
+        new_mass=mass[0:mass.find("kg")+2]
+    else:
+        new_mass=0
+    return new_mass
+
+
+def extract_column_from_header(row):
+    """
+    This function returns the landing status from the HTML table cell 
+    Input: the  element of a table data cell extracts extra row
+    """
+    if (row.br):
+        row.br.extract()
+    if row.a:
+        row.a.extract()
+    if row.sup:
+        row.sup.extract()
+        
+    colunm_name = ' '.join(row.contents)
+    
+    # Filter the digit and empty names
+    if not(colunm_name.strip().isdigit()):
+        colunm_name = colunm_name.strip()
+        return colunm_name    
+static_url = "https://en.wikipedia.org/w/index.php?title=List_of_Falcon_9_and_Falcon_Heavy_launches&oldid=1027686922"
+
+#TASK 1: Request the Falcon9 Launch Wiki page from its URL
+#-------------------------------------
+import requests
+from bs4 import BeautifulSoup
+static_url = "https://en.wikipedia.org/w/index.php?title=List_of_Falcon_9_and_Falcon_Heavy_launches&oldid=1027686922"
+response = requests.get(static_url)
+
+# Check if the request was successful
+if response.status_code == 200:
+    # Parse the HTML content using BeautifulSoup
+    soup = BeautifulSoup(response.content, 'html.parser')
+    print("Successfully fetched and parsed the webpage.")
+else:
+    print(f"Failed to fetch the webpage. Status code: {response.status_code}")
+#---------- The outcom: "Successfully fetched and parsed the webpage." ---------------
+#Check
+import requests
+static_url = "https://en.wikipedia.org/w/index.php?title=List_of_Falcon_9_and_Falcon_Heavy_launches&oldid=1027686922"
+response = requests.get(static_url)
+print(response.status_code)  # To check if the request was successful (200 is success)
+
+# Use soup.title attribute
+import requests
+from bs4 import BeautifulSoup
+static_url = "https://en.wikipedia.org/w/index.php?title=List_of_Falcon_9_and_Falcon_Heavy_launches&oldid=1027686922"
+response = requests.get(static_url)
+if response.status_code == 200:
+    soup = BeautifulSoup(response.text, 'html.parser')
+    print("Successfully created BeautifulSoup object.")
+    
+    print("Page title:", soup.title.string)
+else:
+    print(f"Failed to fetch the webpage. Status code: {response.status_code}")
+# to get this outcome:
+"""
+Successfully created BeautifulSoup object.
+Page title: List of Falcon 9 and Falcon Heavy launches - Wikipedia
+"""
+
+#TASK 2: Extract all column/variable names from the HTML table header
+import requests
+from bs4 import BeautifulSoup
+static_url = "https://en.wikipedia.org/w/index.php?title=List_of_Falcon_9_and_Falcon_Heavy_launches&oldid=1027686922"
+response = requests.get(static_url)
+if response.status_code == 200:
+    soup = BeautifulSoup(response.text, 'html.parser')
+    
+    html_tables = soup.find_all('table')
+    
+    print(f"Found {len(html_tables)} tables on the page.")
+else:
+    print(f"Failed to fetch the webpage. Status code: {response.status_code}")
+# Otcome:
+# Found 26 tables on the page.
+
+#Check: Starting from the third table is our target table contains the actual launch records.
+# Let's print the third table and check its content
+first_launch_table = html_tables[2]
+print(first_launch_table)
+
+# TASK 3: Create a data frame by parsing the launch HTML tables
+# Initialize launch_dict with column names
+launch_dict = dict.fromkeys(column_names)
+if 'Date and time ( )' in launch_dict:
+    del launch_dict['Date and time ( )']
+else:
+    print("Key 'Date and time ( )' not found.")
+
+launch_dict['Flight No.'] = []
+launch_dict['Launch site'] = []
+launch_dict['Payload'] = []
+launch_dict['Payload mass'] = []
+launch_dict['Orbit'] = []
+launch_dict['Customer'] = []
+launch_dict['Launch outcome'] = []
+
+launch_dict['Version Booster'] = []
+launch_dict['Booster landing'] = []
+launch_dict['Date'] = []
+launch_dict['Time'] = []
+
+# Check
+url = "https://api.spacexdata.com/v4/launches"
+response = requests.get(url)
+data = response.json()
+landpads = []
+for launch in data:
+    if 'cores' in launch and launch['cores']:
+        for core in launch['cores']:
+            landpads.append(core.get('landpad'))
+df = pd.DataFrame({'landingPad': landpads})
+missing_values = df['landingPad'].isnull().sum()
+
+print(f"The number of missing values in the 'landingPad' column is: {missing_values}")
+
