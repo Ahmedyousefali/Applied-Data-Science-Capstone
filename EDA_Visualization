@@ -1,0 +1,324 @@
+#"You'll find repeated pieces of code. Please remove them, as they resulted from breaking down the tasks."
+
+
+import piplite
+await piplite.install(['numpy'])
+await piplite.install(['pandas'])
+await piplite.install(['seaborn'])
+# pandas is a software library written for the Python programming language for data manipulation and analysis.
+import pandas as pd
+#NumPy is a library for the Python programming language, adding support for large, multi-dimensional arrays and matrices, along with a large collection of high-level mathematical functions to operate on these arrays
+import numpy as np
+# Matplotlib is a plotting library for python and pyplot gives us a MatLab like plotting framework. We will use this in our plotter function to plot data.
+import matplotlib.pyplot as plt
+#Seaborn is a Python data visualization library based on matplotlib. It provides a high-level interface for drawing attractive and informative statistical graphics
+import seaborn as sns
+
+# Import fetch function from js and io module
+from js import fetch
+import io
+
+# Define the URL of the CSV dataset
+URL = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_2.csv"
+
+# Fetch the dataset from the URL
+resp = await fetch(URL)
+
+# Convert the fetched array buffer to a byte stream
+dataset_part_2_csv = io.BytesIO((await resp.arrayBuffer()).to_py())
+
+# Read the CSV data into a DataFrame
+df = pd.read_csv(dataset_part_2_csv)
+
+# Display the first 5 rows of the DataFrame
+df.head(5)
+
+# Create a categorical plot using seaborn with payload mass on the y-axis and flight number on the x-axis
+# Hue parameter is used to color by the 'Class' column, and aspect ratio is set to 5
+sns.catplot(y="PayloadMass", x="FlightNumber", hue="Class", data=df, aspect=5)
+
+# Set the label for the x-axis with font size 20
+plt.xlabel("Flight Number", fontsize=20)
+
+# Set the label for the y-axis with font size 20
+plt.ylabel("Pay load Mass (kg)", fontsize=20)
+
+# Display the plot
+plt.show()
+
+column_names = df.columns
+print("Column names:", column_names)
+
+# Import necessary libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+import requests
+import io
+
+# Define the URL of the CSV dataset
+url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_2.csv"
+
+# Fetch the dataset from the URL
+response = requests.get(url)
+dataset_part_2_csv = io.BytesIO(response.content)
+
+# Read the CSV data into a DataFrame
+df = pd.read_csv(dataset_part_2_csv)
+
+# Create a mapping of launch sites to numeric values
+launch_site_mapping = {site: idx for idx, site in enumerate(df['LaunchSite'].unique())}
+
+# Map launch sites to their numeric values
+df['LaunchSiteNumeric'] = df['LaunchSite'].map(launch_site_mapping)
+
+# Create a scatter plot of Flight Number vs Launch Site
+plt.figure(figsize=(10, 6))
+plt.scatter(df['FlightNumber'], df['LaunchSiteNumeric'], alpha=0.5)
+plt.title('Flight Number vs Launch Site')
+plt.xlabel('Flight Number')
+plt.ylabel('Launch Site')
+
+# Set the y-axis ticks to the launch site labels
+plt.yticks(ticks=list(launch_site_mapping.values()), labels=list(launch_site_mapping.keys()))
+
+# Display grid
+plt.grid(True)
+
+# Show the plot
+plt.show()
+
+# Import necessary libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+import requests
+import io
+
+# Define the URL of the CSV dataset
+url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_2.csv"
+
+# Fetch the dataset from the URL
+response = requests.get(url)
+dataset_part_2_csv = io.BytesIO(response.content)
+
+# Read the CSV data into a DataFrame
+df = pd.read_csv(dataset_part_2_csv)
+
+# Create a figure with a specific size
+plt.figure(figsize=(10, 6))
+
+# Create a scatter plot with Flight Number on x-axis and Launch Site on y-axis
+plt.scatter(df['FlightNumber'], df['LaunchSite'], alpha=0.5)
+
+# Set the title of the plot
+plt.title('Flight Number vs Launch Site')
+
+# Set the label for the x-axis
+plt.xlabel('Flight Number')
+
+# Set the label for the y-axis
+plt.ylabel('Launch Site')
+
+# Add a grid to the plot
+plt.grid(True)
+
+# Display the plot
+plt.show()
+
+# TASK 1: Visualize the relationship between Flight Number and Launch Site
+
+# Import necessary libraries
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import requests
+import io
+
+# Define the URL of the CSV dataset
+url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_2.csv"
+
+# Fetch the dataset from the URL
+response = requests.get(url)
+dataset_part_2_csv = io.BytesIO(response.content)
+
+# Read the CSV data into a DataFrame
+df = pd.read_csv(dataset_part_2_csv)
+
+# Print the column names of the DataFrame
+print(df.columns)
+
+# Create a categorical plot using seaborn with Flight Number on the x-axis and Launch Site on the y-axis
+# Hue parameter is used to color by the 'Class' column, with strip kind plot
+sns.catplot(data=df, x='FlightNumber', y='LaunchSite', hue='Class', kind='strip', height=6, aspect=2)
+
+# Set the title of the plot
+plt.title('Flight Number vs Launch Site (hue: class)')
+
+# Set the label for the x-axis
+plt.xlabel('Flight Number')
+
+# Set the label for the y-axis
+plt.ylabel('Launch Site')
+
+# Display the plot
+plt.show()
+
+# TASK 2: Visualize the relationship between Payload Mass and Launch Site
+
+# Fetch the dataset from the URL
+response = requests.get(url)
+
+# Convert the fetched content to a byte stream
+dataset_part_2_csv = io.BytesIO(response.content)
+
+# Read the CSV data into a DataFrame
+df = pd.read_csv(dataset_part_2_csv)
+
+# Create a figure with a specific size
+plt.figure(figsize=(10, 6))
+
+# Create a scatter plot using seaborn with Payload Mass on the x-axis and Launch Site on the y-axis
+# Hue parameter is used to color by the 'Class' column, with a specific color palette and transparency
+sns.scatterplot(data=df, x='PayloadMass', y='LaunchSite', hue='Class', palette='viridis', alpha=0.7)
+
+# Set the title of the plot
+plt.title('Payload Mass (kg) vs Launch Site')
+
+# Set the label for the x-axis
+plt.xlabel('Payload Mass (kg)')
+
+# Set the label for the y-axis
+plt.ylabel('Launch Site')
+
+# Add a grid to the plot
+plt.grid(True)
+
+# Display the plot
+plt.show()
+
+import pandas as pd
+import requests
+import io
+import seaborn as sns
+import matplotlib.pyplot as plt
+url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/dataset_part_2.csv"
+response = requests.get(url)
+dataset_part_2_csv = io.BytesIO(response.content)
+df = pd.read_csv(dataset_part_2_csv)
+plt.figure(figsize=(10, 6))
+sns.scatterplot(data=df, x='PayloadMass', y='LaunchSite', hue='Class', palette='viridis', alpha=0.7)
+plt.title('Payload Mass (kg) vs Launch Site')
+plt.xlabel('Payload Mass (kg)')
+plt.ylabel('Launch Site')
+plt.grid(True)
+plt.show()
+
+# TASK 3: Visualize the relationship between success rate of each orbit type¶
+
+# Calculate the success rate for each orbit type by grouping the DataFrame by 'Orbit' and calculating the mean of 'Class'
+orbit_success_rate = df.groupby('Orbit')['Class'].mean().reset_index()
+
+# Create a figure with a specific size
+plt.figure(figsize=(10, 6))
+
+# Create a bar plot using seaborn with orbit type on the x-axis and success rate on the y-axis
+sns.barplot(data=orbit_success_rate, x='Orbit', y='Class')
+
+# Set the title of the plot
+plt.title('Success Rate for Each Orbit Type')
+
+# Set the label for the x-axis
+plt.xlabel('Orbit Type')
+
+# Set the label for the y-axis
+plt.ylabel('Success Rate')
+
+# Rotate the x-axis labels 45 degrees and align them to the right
+plt.xticks(rotation=45, ha="right") 
+
+# Display the plot
+plt.show()
+
+# TASK 4: Visualize the relationship between FlightNumber and Orbit type
+
+# Create a figure with a specific size
+plt.figure(figsize=(10, 6))
+
+# Create a scatter plot using seaborn with Flight Number on the x-axis and Orbit Type on the y-axis
+# Hue parameter is used to color by the 'Class' column, with a coolwarm color palette and no edge color
+sns.scatterplot(data=df, x='FlightNumber', y='Orbit', hue='Class', palette='coolwarm', edgecolor=None)
+
+# Set the title of the plot
+plt.title('Relationship Between FlightNumber and Orbit Type')
+
+# Set the label for the x-axis
+plt.xlabel('Flight Number')
+
+# Set the label for the y-axis
+plt.ylabel('Orbit Type')
+
+# Add a legend with the title 'Launch Success' located at the upper right
+plt.legend(title='Launch Success', loc='upper right')
+
+# Display the plot
+plt.show()
+
+# TASK 5: Visualize the relationship between Payload Mass and Orbit type
+
+# Create a figure with a specific size
+plt.figure(figsize=(10, 6))
+
+# Create a scatter plot using seaborn with Payload Mass on the x-axis and Orbit Type on the y-axis
+# Hue parameter is used to color by the 'Class' column, with a coolwarm color palette and no edge color
+sns.scatterplot(data=df, x='PayloadMass', y='Orbit', hue='Class', palette='coolwarm', edgecolor=None)
+
+# Set the title of the plot
+plt.title('Relationship Between Payload Mass and Orbit Type')
+
+# Set the label for the x-axis
+plt.xlabel('Payload Mass (kg)')
+
+# Set the label for the y-axis
+plt.ylabel('Orbit Type')
+
+# Add a legend with the title 'Launch Success' located at the upper right
+plt.legend(title='Launch Success', loc='upper right')
+
+# Display the plot
+plt.show()
+
+# TASK 6: Visualize the launch success yearly trend
+
+# Define a function to extract the year from the 'Date' column
+def Extract_year():
+    year = []
+    for i in df["Date"]:
+        year.append(i.split("-")[0])  # Extract the year part from the date
+    return year
+
+# Apply the function to create a new 'Year' column in the DataFrame
+df['Year'] = Extract_year()
+
+# Group the data by 'Year' and calculate the mean success rate (Class)
+success_by_year = df.groupby('Year')['Class'].mean().reset_index()
+
+# Create a figure with a specific size
+plt.figure(figsize=(10, 6))
+
+# Create a line plot using seaborn with Year on the x-axis and success rate on the y-axis
+sns.lineplot(data=success_by_year, x='Year', y='Class', marker='o')
+
+# Set the title of the plot
+plt.title('Launch Success Rate Trend Over the Years')
+
+# Set the label for the x-axis
+plt.xlabel('Year')
+
+# Set the label for the y-axis
+plt.ylabel('Average Success Rate')
+
+# Rotate the x-axis labels 45 degrees for readability
+plt.xticks(rotation=45)  
+
+# Display the plot
+plt.show()
+
